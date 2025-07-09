@@ -145,6 +145,23 @@ export const fetchAIUsage = async () => {
   return apiClient.get('/ai/usage');
 };
 
+// New AI Provider APIs
+export const fetchAIProviders = async () => {
+  return apiClient.get('/ai/providers');
+};
+
+export const generateTextWithProvider = async (data) => {
+  return apiClient.post('/ai/generate-text', data);
+};
+
+export const generateCoverArt = async (data) => {
+  return apiClient.post('/ai/generate-cover-art', data);
+};
+
+export const generateTextVariations = async (data) => {
+  return apiClient.post('/ai/text-variations', data);
+};
+
 // Cover APIs
 export const fetchCovers = async (novelId) => {
   return apiClient.get(`/covers/${novelId}`);
@@ -216,6 +233,10 @@ export const api = {
   analyzeText,
   fetchAIModels,
   fetchAIUsage,
+  fetchAIProviders,
+  generateTextWithProvider,
+  generateCoverArt,
+  generateTextVariations,
   
   // Covers
   fetchCovers,

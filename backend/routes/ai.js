@@ -319,4 +319,128 @@ router.get('/usage', (req, res) => {
   }
 });
 
+// GET /api/ai/providers - Get available AI providers and models
+router.get('/providers', async (req, res) => {
+  try {
+    const providers = aiService.getAvailableProviders();
+    res.json({ providers });
+  } catch (error) {
+    logger.error('Error fetching providers', { error: error.message });
+    res.status(500).json({ message: 'Failed to fetch providers', error: error.message });
+  }
+});
+
+// POST /api/ai/generate-text - Generate text with provider choice
+router.post('/generate-text', async (req, res) => {
+  try {
+    const { 
+      prompt, 
+      provider = 'openai', 
+      model, 
+      maxTokens = 2000, 
+      temperature = 0.7,
+      systemPrompt = ''
+    } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ message: 'Prompt is required' });
+    }
+
+    const result = await aiService.generateTextWithProvider(prompt, {
+      provider,
+      model,
+      maxTokens,
+      temperature,
+      systemPrompt
+    });
+
+    logger.info('Text generated with provider', { 
+      provider, 
+      model,
+      tokensUsed: result.tokensUsed 
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error generating text with provider', { error: error.message });
+    res.status(500).json({ message: 'Failed to generate text', error: error.message });
+  }
+});
+
+// POST /api/ai/generate-cover-art - Generate cover art with Replicate
+router.post('/generate-cover-art', async (req, res) => {
+  try {
+    const { 
+      prompt, 
+      provider = 'replicate',
+      model = 'flux_dev',
+      width = 512,
+      height = 768,
+      numImages = 1,
+      guidance = 7.5,
+      steps = 20
+    } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ message: 'Prompt is required' });
+    }
+
+    const result = await aiService.generateCoverImage(prompt, {
+      provider,
+      model,
+      width,
+      height,
+      numImages,
+      guidance,
+      steps
+    });
+
+    logger.info('Cover art generated', { 
+      provider, 
+      model,
+      imagesGenerated: result.images?.length || 1
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error generating cover art', { error: error.message });
+    res.status(500).json({ message: 'Failed to generate cover art', error: error.message });
+  }
+});
+
+// POST /api/ai/text-variations - Generate multiple text variations
+router.post('/text-variations', async (req, res) => {
+  try {
+    const { 
+      prompt, 
+      models = ['llama3_70b', 'mixtral_8x7b'],
+      count = 2,
+      maxTokens = 2000,
+      temperature = 0.7
+    } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ message: 'Prompt is required' });
+    }
+
+    const replicateService = require('../services/replicateService');
+    const result = await replicateService.generateTextVariations(prompt, {
+      models,
+      count,
+      maxTokens,
+      temperature
+    });
+
+    logger.info('Text variations generated', { 
+      modelsUsed: models,
+      variationsGenerated: result.totalCount
+    });
+
+    res.json(result);
+  } catch (error) {
+    logger.error('Error generating text variations', { error: error.message });
+    res.status(500).json({ message: 'Failed to generate text variations', error: error.message });
+  }
+});
+
 module.exports = router;

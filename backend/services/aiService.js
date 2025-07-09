@@ -1,4 +1,5 @@
 const OpenAI = require('openai');
+const replicateService = require('./replicateService');
 const winston = require('winston');
 
 class AIService {
@@ -38,6 +39,69 @@ class AIService {
         drafting: parseInt(process.env.MAX_TOKENS_GPT4) || 4096,
         reviewing: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 8192
       }
+    };
+
+    // AI Providers
+    this.providers = {
+      openai: 'openai',
+      replicate: 'replicate'
+    };
+  }
+
+  /**
+   * Generate text using specified provider
+   */
+  async generateTextWithProvider(prompt, options = {}) {
+    const {
+      provider = this.providers.openai,
+      model,
+      maxTokens = 2000,
+      temperature = this.defaultSettings.temperature,
+      systemPrompt = ''
+    } = options;
+
+    if (provider === this.providers.replicate) {
+      return await replicateService.generateText(prompt, {
+        model: model || 'llama3_70b',
+        maxTokens,
+        temperature,
+        systemPrompt
+      });
+    } else {
+      // Default to OpenAI
+      const response = await this.openai.chat.completions.create({
+        model: model || this.models.drafting,
+        messages: [
+          ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+          { role: 'user', content: prompt }
+        ],
+        temperature,
+        max_tokens: maxTokens,
+      });
+
+      return {
+        content: response.choices[0].message.content,
+        model: model || this.models.drafting,
+        provider: 'openai',
+        tokensUsed: response.usage.total_tokens
+      };
+    }
+  }
+
+  /**
+   * Get available AI providers and models
+   */
+  getAvailableProviders() {
+    return {
+      openai: {
+        name: 'OpenAI',
+        models: {
+          'gpt-4': { name: 'GPT-4', description: 'Most capable model for complex tasks' },
+          'gpt-4-1106-preview': { name: 'GPT-4 Turbo', description: 'Faster and more cost-effective' },
+          'gpt-3.5-turbo': { name: 'GPT-3.5 Turbo', description: 'Fast and efficient' }
+        }
+      },
+      replicate: replicateService.getAvailableModels()
     };
   }
 
@@ -249,43 +313,77 @@ class AIService {
   }
 
   /**
-   * Generate book cover image
+   * Generate book cover image with provider choice
    */
   async generateCoverImage(prompt, settings = {}) {
     const startTime = Date.now();
+    const provider = settings.provider || 'openai';
     
     try {
-      const response = await this.openai.images.generate({
-        model: this.models.image,
-        prompt: prompt,
-        size: settings.size || '1024x1024',
-        quality: settings.quality || 'standard',
-        style: settings.style || 'natural',
-        n: 1
-      });
+      if (provider === 'replicate') {
+        const result = await replicateService.generateCoverArt(prompt, {
+          model: settings.model || 'flux_dev',
+          width: 512,
+          height: 768,
+          numImages: settings.numImages || 1,
+          guidance: settings.guidance || 7.5,
+          steps: settings.steps || 20
+        });
 
-      const generationTime = Date.now() - startTime;
-      
-      this.logger.info('Cover image generated', {
-        prompt: prompt.substring(0, 100),
-        size: settings.size || '1024x1024',
-        quality: settings.quality || 'standard',
-        generationTime
-      });
+        const generationTime = Date.now() - startTime;
+        
+        this.logger.info('Cover image generated with Replicate', {
+          prompt: prompt.substring(0, 100),
+          model: settings.model || 'flux_dev',
+          generationTime
+        });
 
-      return {
-        imageUrl: response.data[0].url,
-        revisedPrompt: response.data[0].revised_prompt,
-        metadata: {
-          model: this.models.image,
-          generationTime,
-          settings: {
-            size: settings.size || '1024x1024',
-            quality: settings.quality || 'standard',
-            style: settings.style || 'natural'
+        return {
+          imageUrl: result.images[0],
+          images: result.images,
+          revisedPrompt: result.prompt,
+          metadata: {
+            provider: 'replicate',
+            model: result.model,
+            generationTime,
+            settings: settings
           }
-        }
-      };
+        };
+      } else {
+        // Default OpenAI implementation
+        const response = await this.openai.images.generate({
+          model: this.models.image,
+          prompt: prompt,
+          size: settings.size || '1024x1024',
+          quality: settings.quality || 'standard',
+          style: settings.style || 'natural',
+          n: 1
+        });
+
+        const generationTime = Date.now() - startTime;
+        
+        this.logger.info('Cover image generated with OpenAI', {
+          prompt: prompt.substring(0, 100),
+          size: settings.size || '1024x1024',
+          quality: settings.quality || 'standard',
+          generationTime
+        });
+
+        return {
+          imageUrl: response.data[0].url,
+          revisedPrompt: response.data[0].revised_prompt,
+          metadata: {
+            provider: 'openai',
+            model: this.models.image,
+            generationTime,
+            settings: {
+              size: settings.size || '1024x1024',
+              quality: settings.quality || 'standard',
+              style: settings.style || 'natural'
+            }
+          }
+        };
+      }
 
     } catch (error) {
       this.logger.error('Cover image generation failed', { error: error.message });
