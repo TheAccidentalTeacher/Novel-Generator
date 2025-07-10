@@ -393,9 +393,26 @@ class AIService {
 
   // Helper methods for building prompts
   buildPremisePrompt(genre, customization, additionalInputs) {
-    const genreContext = genre.getPromptingContext('planning');
+    // Handle both database models and mock objects
+    let genreContext;
+    if (typeof genre.getPromptingContext === 'function') {
+      // Database model with method
+      genreContext = genre.getPromptingContext('planning');
+    } else {
+      // Mock object - build context from properties
+      genreContext = {
+        definition: genre.description,
+        keyCharacteristics: genre.characteristics || [],
+        specificGuidance: {
+          themes: genre.conventions?.themes || [],
+          characterTypes: genre.conventions?.characterTypes || [],
+          commonPlots: genre.conventions?.commonPlots || []
+        },
+        christianElements: genre.name === 'Christian Fiction'
+      };
+    }
     
-    const prompt = `You are an expert fiction writer specializing in ${genre.name}. Generate 3-5 compelling novel premises that adhere to the following genre requirements:
+    let prompt = `You are an expert fiction writer specializing in ${genre.name}. Generate 3-5 compelling novel premises that adhere to the following genre requirements:
 
 GENRE: ${genre.name}
 DESCRIPTION: ${genreContext.definition}
