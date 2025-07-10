@@ -42,6 +42,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/novelforg
 .catch((error) => logger.error('MongoDB connection error:', error));
 
 // Middleware
+app.set('trust proxy', true); // Trust Railway proxy headers
 app.use(helmet());
 app.use(compression());
 app.use(cors({
