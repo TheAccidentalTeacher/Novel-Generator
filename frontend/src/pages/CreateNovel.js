@@ -16,26 +16,20 @@ import {
   NumberInputStepper,
   NumberIncrementStepper,
   NumberDecrementStepper,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
   Card,
   CardBody,
   CardHeader,
   Divider,
   Alert,
   AlertIcon,
-  Checkbox,
   SimpleGrid,
-  Badge,
   useToast,
-  Spinner,
   Box,
   Icon,
+  Circle,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiZap, FiSettings, FiBook } from 'react-icons/fi';
+import { FiArrowLeft, FiZap, FiBook } from 'react-icons/fi';
 import { api } from '../services/api';
 
 const CreateNovel = () => {
@@ -107,7 +101,7 @@ const CreateNovel = () => {
       console.log('AI Response:', response); // Debug log
       
       // Extract the first premise from the response
-      const firstPremise = response.premises && response.premises[0];
+      const firstPremise = response.premises && response.premises.premises && response.premises.premises[0];
       if (firstPremise) {
         handleInputChange('premise', firstPremise.summary);
       } else {
@@ -189,19 +183,10 @@ const CreateNovel = () => {
           <VStack spacing={6} align="stretch">
             <Card>
               <CardHeader>
-                <Heading size="md">Basic Information</Heading>
+                <Heading size="md">Genre & Premise</Heading>
               </CardHeader>
               <CardBody>
                 <VStack spacing={4} align="stretch">
-                  <FormControl isRequired>
-                    <FormLabel>Novel Title</FormLabel>
-                    <Input
-                      placeholder="Enter your novel's title"
-                      value={formData.title}
-                      onChange={(e) => handleInputChange('title', e.target.value)}
-                    />
-                  </FormControl>
-
                   <FormControl isRequired>
                     <FormLabel>Genre</FormLabel>
                     <Select
@@ -363,47 +348,64 @@ const CreateNovel = () => {
           <VStack spacing={6} align="stretch">
             <Card>
               <CardHeader>
-                <Heading size="md">Review & Create</Heading>
+                <Heading size="md">Title & Final Review</Heading>
               </CardHeader>
               <CardBody>
-                <VStack spacing={4} align="stretch">
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
-                    <Box>
-                      <Text fontWeight="bold">Title:</Text>
-                      <Text>{formData.title}</Text>
-                    </Box>
-                    <Box>
-                      <Text fontWeight="bold">Genre:</Text>
-                      <Text>
-                        {genres.find(g => g._id === formData.genre)?.name || 'Not selected'}
-                      </Text>
-                    </Box>
-                    <Box>
-                      <Text fontWeight="bold">Target Word Count:</Text>
-                      <Text>{formData.targetWordCount.toLocaleString()} words</Text>
-                    </Box>
-                    <Box>
-                      <Text fontWeight="bold">Chapters:</Text>
-                      <Text>{formData.chapters}</Text>
-                    </Box>
-                  </SimpleGrid>
+                <VStack spacing={6} align="stretch">
+                  <FormControl isRequired>
+                    <FormLabel>Novel Title</FormLabel>
+                    <Input
+                      placeholder="Enter your novel's title"
+                      value={formData.title}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      size="lg"
+                    />
+                    <Text fontSize="sm" color="gray.600" mt={1}>
+                      Choose a compelling title that captures your story's essence
+                    </Text>
+                  </FormControl>
 
                   <Divider />
 
                   <Box>
-                    <Text fontWeight="bold" mb={2}>Premise:</Text>
-                    <Text color="gray.600">{formData.premise}</Text>
-                  </Box>
-
-                  {formData.customInstructions && (
-                    <>
-                      <Divider />
+                    <Text fontWeight="bold" mb={4}>Review Your Novel Setup:</Text>
+                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                       <Box>
-                        <Text fontWeight="bold" mb={2}>Custom Instructions:</Text>
-                        <Text color="gray.600">{formData.customInstructions}</Text>
+                        <Text fontWeight="semibold">Genre:</Text>
+                        <Text>
+                          {genres.find(g => g._id === formData.genre)?.name || 'Not selected'}
+                        </Text>
                       </Box>
-                    </>
-                  )}
+                      <Box>
+                        <Text fontWeight="semibold">Target Word Count:</Text>
+                        <Text>{formData.targetWordCount.toLocaleString()} words</Text>
+                      </Box>
+                      <Box>
+                        <Text fontWeight="semibold">Chapters:</Text>
+                        <Text>{formData.chapters}</Text>
+                      </Box>
+                      <Box>
+                        <Text fontWeight="semibold">Writing Style:</Text>
+                        <Text>{formData.writingStyle.charAt(0).toUpperCase() + formData.writingStyle.slice(1)}</Text>
+                      </Box>
+                    </SimpleGrid>
+
+                    <Box mt={4}>
+                      <Text fontWeight="semibold" mb={2}>Premise:</Text>
+                      <Text color="gray.600" bg="gray.50" p={3} borderRadius="md">
+                        {formData.premise || 'No premise entered'}
+                      </Text>
+                    </Box>
+
+                    {formData.customInstructions && (
+                      <Box mt={4}>
+                        <Text fontWeight="semibold" mb={2}>Custom Instructions:</Text>
+                        <Text color="gray.600" bg="gray.50" p={3} borderRadius="md">
+                          {formData.customInstructions}
+                        </Text>
+                      </Box>
+                    )}
+                  </Box>
                 </VStack>
               </CardBody>
             </Card>
@@ -421,44 +423,53 @@ const CreateNovel = () => {
   };
 
   return (
-    <Container maxW="4xl" py={8}>
+    <Container maxW="container.md" py={8}>
       <VStack spacing={8} align="stretch">
-        <VStack align="start" spacing={2}>
+        {/* Header */}
+        <VStack spacing={4} align="center">
           <Button
             as={RouterLink}
             to="/dashboard"
-            leftIcon={<FiArrowLeft />}
+            leftIcon={<Icon as={FiArrowLeft} />}
             variant="ghost"
-            size="sm"
+            alignSelf="flex-start"
           >
             Back to Dashboard
           </Button>
-          <Heading size="lg">Create New Novel</Heading>
-          <Text color="gray.600">
-            Step {step} of 3: {step === 1 ? 'Basic Information' : step === 2 ? 'Structure & Preferences' : 'Review & Create'}
+          
+          <Heading size="xl" textAlign="center">Create New Novel</Heading>
+          <Text color="gray.600" textAlign="center">
+            Step {step} of 3: {step === 1 ? 'Genre & Premise' : step === 2 ? 'Story Structure' : 'Title & Review'}
           </Text>
         </VStack>
 
-        {/* Progress indicator */}
-        <HStack spacing={2}>
+        {/* Progress Indicator */}
+        <HStack spacing={4} justify="center">
           {[1, 2, 3].map((stepNumber) => (
-            <React.Fragment key={stepNumber}>
-              <Badge
-                colorScheme={stepNumber <= step ? 'blue' : 'gray'}
-                variant={stepNumber === step ? 'solid' : 'outline'}
-                px={3}
-                py={1}
+            <HStack key={stepNumber} spacing={2}>
+              <Circle
+                size="40px"
+                bg={step >= stepNumber ? 'blue.500' : 'gray.200'}
+                color={step >= stepNumber ? 'white' : 'gray.500'}
+                fontWeight="bold"
               >
                 {stepNumber}
-              </Badge>
-              {stepNumber < 3 && <Box flex={1} h={1} bg={stepNumber < step ? 'blue.200' : 'gray.200'} />}
-            </React.Fragment>
+              </Circle>
+              {stepNumber < 3 && (
+                <Box
+                  w="60px"
+                  h="2px"
+                  bg={step > stepNumber ? 'blue.500' : 'gray.200'}
+                />
+              )}
+            </HStack>
           ))}
         </HStack>
 
+        {/* Step Content */}
         {renderStepContent()}
 
-        {/* Navigation buttons */}
+        {/* Navigation */}
         <HStack justify="space-between">
           <Button
             variant="outline"
@@ -472,6 +483,10 @@ const CreateNovel = () => {
             <Button
               colorScheme="blue"
               onClick={() => setStep(step + 1)}
+              isDisabled={
+                (step === 1 && (!formData.genre || !formData.premise)) ||
+                (step === 2 && false) // No required fields in step 2
+              }
             >
               Next
             </Button>
@@ -482,6 +497,7 @@ const CreateNovel = () => {
               onClick={createNovel}
               isLoading={isLoading}
               loadingText="Creating..."
+              isDisabled={!formData.title}
             >
               Create Novel
             </Button>

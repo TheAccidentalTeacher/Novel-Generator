@@ -121,6 +121,193 @@ const mockGenres = [
       characterTypes: ['Amateur sleuth', 'Townspeople', 'Local authority'],
       commonPlots: ['Local crime', 'Small town secrets', 'Community disruption']
     }
+  },
+  {
+    _id: '4',
+    name: 'Romance',
+    description: 'Love stories with emotional journeys and happy endings',
+    characteristics: ['Romantic tension', 'Character growth', 'Happy ending'],
+    conventions: {
+      themes: ['Love', 'Trust', 'Commitment'],
+      characterTypes: ['Love interest', 'Protagonist', 'Rival'],
+      commonPlots: ['Enemies to lovers', 'Second chance', 'Forbidden love']
+    }
+  },
+  {
+    _id: '5',
+    name: 'Fantasy',
+    description: 'Magical worlds with supernatural elements and adventure',
+    characteristics: ['Magic systems', 'World-building', 'Quest narratives'],
+    conventions: {
+      themes: ['Good vs Evil', 'Power', 'Destiny'],
+      characterTypes: ['Hero', 'Mentor', 'Dark Lord'],
+      commonPlots: ['Chosen one', 'Quest', 'Coming of age']
+    }
+  },
+  {
+    _id: '6',
+    name: 'Science Fiction',
+    description: 'Futuristic stories exploring technology and its impact',
+    characteristics: ['Advanced technology', 'Future settings', 'Scientific concepts'],
+    conventions: {
+      themes: ['Progress', 'Identity', 'Survival'],
+      characterTypes: ['Scientist', 'Explorer', 'AI'],
+      commonPlots: ['First contact', 'Dystopian future', 'Space exploration']
+    }
+  },
+  {
+    _id: '7',
+    name: 'Historical Fiction',
+    description: 'Stories set in the past with authentic historical details',
+    characteristics: ['Historical accuracy', 'Period atmosphere', 'Cultural context'],
+    conventions: {
+      themes: ['Change', 'Tradition', 'Identity'],
+      characterTypes: ['Historical figure', 'Commoner', 'Aristocrat'],
+      commonPlots: ['War story', 'Social change', 'Personal journey']
+    }
+  },
+  {
+    _id: '8',
+    name: 'Thriller',
+    description: 'Fast-paced stories with constant tension and suspense',
+    characteristics: ['High stakes', 'Constant danger', 'Quick pacing'],
+    conventions: {
+      themes: ['Survival', 'Betrayal', 'Justice'],
+      characterTypes: ['Protagonist', 'Antagonist', 'Victim'],
+      commonPlots: ['Chase', 'Conspiracy', 'Rescue mission']
+    }
+  },
+  {
+    _id: '9',
+    name: 'Horror',
+    description: 'Dark stories designed to frighten and create suspense',
+    characteristics: ['Fear', 'Supernatural elements', 'Psychological tension'],
+    conventions: {
+      themes: ['Good vs Evil', 'Survival', 'Madness'],
+      characterTypes: ['Final girl', 'Monster', 'Innocent'],
+      commonPlots: ['Haunted house', 'Monster attack', 'Psychological breakdown']
+    }
+  },
+  {
+    _id: '10',
+    name: 'Literary Fiction',
+    description: 'Character-driven stories with artistic and thematic depth',
+    characteristics: ['Character development', 'Stylistic prose', 'Thematic complexity'],
+    conventions: {
+      themes: ['Human condition', 'Relationships', 'Society'],
+      characterTypes: ['Complex protagonist', 'Ensemble cast', 'Unreliable narrator'],
+      commonPlots: ['Coming of age', 'Family saga', 'Social commentary']
+    }
+  },
+  {
+    _id: '11',
+    name: 'Young Adult',
+    description: 'Stories for teenage readers with young protagonists',
+    characteristics: ['Teen protagonists', 'Coming of age', 'Identity themes'],
+    conventions: {
+      themes: ['Identity', 'Friendship', 'First love'],
+      characterTypes: ['Teen hero', 'Best friend', 'Love interest'],
+      commonPlots: ['High school drama', 'Dystopian adventure', 'Supernatural romance']
+    }
+  },
+  {
+    _id: '12',
+    name: 'Adventure',
+    description: 'Action-packed stories with exciting journeys and quests',
+    characteristics: ['Physical challenges', 'Exotic locations', 'Fast pacing'],
+    conventions: {
+      themes: ['Courage', 'Discovery', 'Survival'],
+      characterTypes: ['Adventurer', 'Guide', 'Antagonist'],
+      commonPlots: ['Treasure hunt', 'Survival story', 'Exploration']
+    }
+  },
+  {
+    _id: '13',
+    name: 'Western',
+    description: 'Stories set in the American frontier with cowboys and outlaws',
+    characteristics: ['Frontier setting', 'Moral codes', 'Gunfights'],
+    conventions: {
+      themes: ['Justice', 'Freedom', 'Civilization vs Wild'],
+      characterTypes: ['Gunslinger', 'Sheriff', 'Outlaw'],
+      commonPlots: ['Showdown', 'Cattle drive', 'Town taming']
+    }
+  },
+  {
+    _id: '14',
+    name: 'Contemporary Fiction',
+    description: 'Modern stories reflecting current life and social issues',
+    characteristics: ['Current settings', 'Realistic characters', 'Social relevance'],
+    conventions: {
+      themes: ['Modern life', 'Relationships', 'Social issues'],
+      characterTypes: ['Everyday people', 'Professionals', 'Families'],
+      commonPlots: ['Life changes', 'Relationship drama', 'Career challenges']
+    }
+  },
+  {
+    _id: '15',
+    name: 'Dystopian',
+    description: 'Dark futures with oppressive societies and rebellion',
+    characteristics: ['Oppressive government', 'Rebellion', 'Social control'],
+    conventions: {
+      themes: ['Freedom', 'Resistance', 'Power'],
+      characterTypes: ['Rebel', 'Oppressor', 'Citizen'],
+      commonPlots: ['Uprising', 'Escape', 'Revolution']
+    }
+  },
+  {
+    _id: '16',
+    name: 'Urban Fantasy',
+    description: 'Fantasy elements in modern urban settings',
+    characteristics: ['Modern city setting', 'Hidden magic', 'Supernatural beings'],
+    conventions: {
+      themes: ['Hidden world', 'Power', 'Identity'],
+      characterTypes: ['Urban witch', 'Supernatural detective', 'Mythical creature'],
+      commonPlots: ['Supernatural mystery', 'Magical awakening', 'Urban legend']
+    }
+  },
+  {
+    _id: '17',
+    name: 'Paranormal Romance',
+    description: 'Romance with supernatural elements and otherworldly beings',
+    characteristics: ['Supernatural love interests', 'Paranormal elements', 'Romantic tension'],
+    conventions: {
+      themes: ['Forbidden love', 'Supernatural bonds', 'Destiny'],
+      characterTypes: ['Vampire', 'Werewolf', 'Psychic'],
+      commonPlots: ['Supernatural mate', 'Forbidden romance', 'Supernatural triangle']
+    }
+  },
+  {
+    _id: '18',
+    name: 'Space Opera',
+    description: 'Epic science fiction with galactic scope and adventure',
+    characteristics: ['Galactic scale', 'Advanced civilizations', 'Epic conflicts'],
+    conventions: {
+      themes: ['Empire', 'Rebellion', 'Destiny'],
+      characterTypes: ['Space captain', 'Alien ruler', 'Rebel leader'],
+      commonPlots: ['Galactic war', 'Space exploration', 'Alien encounter']
+    }
+  },
+  {
+    _id: '19',
+    name: 'Cyberpunk',
+    description: 'High-tech, low-life futures with corporate dystopias',
+    characteristics: ['Cybernetic enhancement', 'Corporate control', 'Information warfare'],
+    conventions: {
+      themes: ['Technology vs humanity', 'Corporate power', 'Identity'],
+      characterTypes: ['Hacker', 'Corporate executive', 'Cyborg'],
+      commonPlots: ['Data heist', 'Corporate conspiracy', 'Virtual reality']
+    }
+  },
+  {
+    _id: '20',
+    name: 'Magical Realism',
+    description: 'Realistic stories with subtle magical or fantastical elements',
+    characteristics: ['Subtle magic', 'Realistic settings', 'Symbolic elements'],
+    conventions: {
+      themes: ['Reality vs fantasy', 'Cultural identity', 'Memory'],
+      characterTypes: ['Ordinary person', 'Wise elder', 'Mysterious figure'],
+      commonPlots: ['Mysterious events', 'Cultural journey', 'Family secrets']
+    }
   }
 ];
 
