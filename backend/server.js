@@ -54,7 +54,10 @@ app.use(cors({
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false, // Disable legacy X-RateLimit-* headers
+  trustProxy: true, // Trust Railway proxy headers
 });
 app.use(limiter);
 
@@ -62,7 +65,10 @@ app.use(limiter);
 const aiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 50, // limit each IP to 50 AI requests per hour
-  message: 'AI request limit exceeded, please try again later.'
+  message: 'AI request limit exceeded, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  trustProxy: true, // Trust Railway proxy headers
 });
 
 app.use(express.json({ limit: '10mb' }));
