@@ -104,8 +104,10 @@ const CreateNovel = () => {
         keywords: formData.premiseKeywords
       });
       
+      console.log('AI Response:', response); // Debug log
+      
       // Extract the first premise from the response
-      const firstPremise = response.premises && response.premises.premises && response.premises.premises[0];
+      const firstPremise = response.premises && response.premises[0];
       if (firstPremise) {
         handleInputChange('premise', firstPremise.summary);
       } else {

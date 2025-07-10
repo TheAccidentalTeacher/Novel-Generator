@@ -50,26 +50,26 @@ app.use(cors({
   credentials: true
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false, // Disable legacy X-RateLimit-* headers
-  trustProxy: true, // Trust Railway proxy headers
-});
-app.use(limiter);
+// Rate limiting - disabled for Railway deployment issues
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 100, // limit each IP to 100 requests per windowMs
+//   message: 'Too many requests from this IP, please try again later.',
+//   standardHeaders: true, // Return rate limit info in headers
+//   legacyHeaders: false, // Disable legacy X-RateLimit-* headers
+//   trustProxy: true, // Trust Railway proxy headers
+// });
+// app.use(limiter);
 
-// Stricter rate limiting for AI endpoints
-const aiLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50, // limit each IP to 50 AI requests per hour
-  message: 'AI request limit exceeded, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  trustProxy: true, // Trust Railway proxy headers
-});
+// Stricter rate limiting for AI endpoints - disabled for Railway deployment issues
+// const aiLimiter = rateLimit({
+//   windowMs: 60 * 60 * 1000, // 1 hour
+//   max: 50, // limit each IP to 50 AI requests per hour
+//   message: 'AI request limit exceeded, please try again later.',
+//   standardHeaders: true,
+//   legacyHeaders: false,
+//   trustProxy: true, // Trust Railway proxy headers
+// });
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
