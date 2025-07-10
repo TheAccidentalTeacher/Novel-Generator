@@ -35,9 +35,9 @@ class AIService {
     this.defaultSettings = {
       temperature: parseFloat(process.env.DEFAULT_TEMPERATURE) || 0.7,
       maxTokens: {
-        planning: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 8192,
-        drafting: parseInt(process.env.MAX_TOKENS_GPT4) || 4096,
-        reviewing: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 8192
+        planning: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 4000, // Reduced to stay under 4096 limit
+        drafting: parseInt(process.env.MAX_TOKENS_GPT4) || 4000, // Reduced to stay under 4096 limit
+        reviewing: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 4000 // Reduced to stay under 4096 limit
       }
     };
 
