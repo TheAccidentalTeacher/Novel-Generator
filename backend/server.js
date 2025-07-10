@@ -84,7 +84,7 @@ app.use((req, res, next) => {
 app.use('/api/novels', novelRoutes);
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/genres', genreRoutes);
-app.use('/api/ai', aiLimiter, aiRoutes);
+app.use('/api/ai', aiRoutes); // Temporarily disable AI rate limiting
 app.use('/api/covers', coverRoutes);
 
 // Mock data for development (when MongoDB is not available)
