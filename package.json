@@ -1,0 +1,13 @@
+{
+  "name": "novelforge-monorepo",
+  "version": "1.0.0",
+  "description": "NovelForge Full Stack Application",
+  "scripts": {
+    "start": "cd backend && npm start",
+    "build": "cd backend && npm install",
+    "install": "cd backend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
