@@ -35,7 +35,7 @@ import {
   Icon,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiWand2, FiSettings, FiBook } from 'react-icons/fi';
+import { FiArrowLeft, FiWand, FiSettings, FiBook } from 'react-icons/fi';
 import { api } from '../services/api';
 
 const CreateNovel = () => {
@@ -220,7 +220,7 @@ const CreateNovel = () => {
                         onChange={(e) => handleInputChange('premiseKeywords', e.target.value)}
                       />
                       <Button
-                        leftIcon={<Icon as={FiWand2} />}
+                        leftIcon={<Icon as={FiWand} />}
                         onClick={generatePremise}
                         isLoading={isLoading}
                         loadingText="Generating..."

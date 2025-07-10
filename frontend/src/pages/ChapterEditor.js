@@ -47,7 +47,7 @@ import {
   FiSave, 
   FiEdit, 
   FiEye,
-  FiWand2,
+  FiWand,
   FiRefreshCw,
   FiSettings,
   FiFileText,
@@ -206,7 +206,7 @@ As if in response to her words, the morning sun broke through the mist, setting 
             
             <HStack>
               <Button
-                leftIcon={<FiWand2 />}
+                leftIcon={<FiWand />}
                 colorScheme="purple"
                 variant="outline"
                 onClick={onGenerateOpen}
@@ -360,7 +360,7 @@ As if in response to her words, the morning sun broke through the mist, setting 
                 </CardHeader>
                 <CardBody>
                   <VStack spacing={2}>
-                    <Button size="sm" w="full" leftIcon={<FiWand2 />} variant="outline">
+                    <Button size="sm" w="full" leftIcon={<FiWand />} variant="outline">
                       Generate Next Paragraph
                     </Button>
                     <Button size="sm" w="full" leftIcon={<FiRefreshCw />} variant="outline">
