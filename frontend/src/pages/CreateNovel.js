@@ -100,11 +100,17 @@ const CreateNovel = () => {
     setIsLoading(true);
     try {
       const response = await api.generatePremise({
-        genre: formData.genre,
+        genreId: formData.genre,
         keywords: formData.premiseKeywords
       });
       
-      handleInputChange('premise', response.data.premise);
+      // Extract the first premise from the response
+      const firstPremise = response.premises && response.premises.premises && response.premises.premises[0];
+      if (firstPremise) {
+        handleInputChange('premise', firstPremise.summary);
+      } else {
+        throw new Error('Invalid response format');
+      }
       toast({
         title: 'Premise Generated!',
         description: 'AI has created a compelling premise for your novel',
