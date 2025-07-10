@@ -26,18 +26,18 @@ class AIService {
 
     // Model configurations
     this.models = {
-      planning: 'gpt-4-1106-preview', // GPT-4.1 for planning
-      drafting: 'gpt-4', // GPT-4.0 for drafting  
-      reviewing: 'gpt-4-1106-preview', // GPT-4.1 for reviewing
+      planning: 'gpt-4-turbo-preview', // GPT-4 Turbo for planning (128k context)
+      drafting: 'gpt-4-turbo-preview', // GPT-4 Turbo for drafting (128k context)
+      reviewing: 'gpt-4-turbo-preview', // GPT-4 Turbo for reviewing (128k context)
       image: 'dall-e-3'
     };
 
     this.defaultSettings = {
       temperature: parseFloat(process.env.DEFAULT_TEMPERATURE) || 0.7,
       maxTokens: {
-        planning: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 4000, // Reduced to stay under 4096 limit
-        drafting: parseInt(process.env.MAX_TOKENS_GPT4) || 4000, // Reduced to stay under 4096 limit
-        reviewing: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 4000 // Reduced to stay under 4096 limit
+        planning: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 4000, // Planning can stay at 4k
+        drafting: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 8000, // Chapter generation needs 8k+ for 2-4k words
+        reviewing: parseInt(process.env.MAX_TOKENS_GPT4_TURBO) || 4000 // Reviews can stay at 4k
       }
     };
 
@@ -269,6 +269,61 @@ class AIService {
         chapterNumber: chapterOutline.number 
       });
       throw new Error(`Failed to generate chapter: ${error.message}`);
+    }
+  }
+
+  /**
+   * Generate a long-form novel chapter (2000-4000 words)
+   */
+  async generateLongChapter(chapterOutline, context, customization = {}) {
+    const startTime = Date.now();
+    
+    try {
+      const prompt = this.buildLongChapterPrompt(chapterOutline, context, customization);
+      
+      // Calculate appropriate token limit based on target word count
+      const targetWords = customization.targetWords || 3000;
+      const estimatedTokens = Math.ceil(targetWords * 1.33); // ~1.33 tokens per word
+      const maxTokens = Math.min(estimatedTokens + 1000, 16000); // Add buffer, cap at 16k
+      
+      const response = await this.openai.chat.completions.create({
+        model: this.models.drafting, // Using GPT-4 Turbo
+        messages: [{ role: 'user', content: prompt }],
+        temperature: customization.temperature || this.defaultSettings.temperature,
+        max_tokens: maxTokens,
+      });
+
+      const generationTime = Date.now() - startTime;
+      
+      this.logger.info('Long chapter generated', {
+        chapterNumber: chapterOutline.number,
+        targetWords,
+        maxTokens,
+        tokensUsed: response.usage.total_tokens,
+        generationTime,
+        model: this.models.drafting
+      });
+
+      return {
+        content: response.choices[0].message.content,
+        metadata: {
+          model: this.models.drafting,
+          tokensUsed: response.usage.total_tokens,
+          generationTime,
+          targetWords,
+          maxTokens,
+          temperature: customization.temperature || this.defaultSettings.temperature,
+          prompt: prompt // Store for debugging
+        }
+      };
+
+    } catch (error) {
+      this.logger.error('Long chapter generation failed', { 
+        error: error.message, 
+        chapterNumber: chapterOutline.number,
+        targetWords: customization.targetWords
+      });
+      throw new Error(`Failed to generate long chapter: ${error.message}`);
     }
   }
 
@@ -525,6 +580,55 @@ Format as detailed JSON with the specified structure.`;
     const wordCountRange = `${customization.chapterWordCount?.min || 1750}-${customization.chapterWordCount?.max || 2250}`;
     
     let prompt = `You are an expert fiction writer crafting Chapter ${chapterOutline.number} of a ${context.genre.name} novel.
+
+CHAPTER OUTLINE:
+Title: ${chapterOutline.title}
+Summary: ${chapterOutline.summary}
+Objectives: ${chapterOutline.objectives.join(', ')}
+Word Count Target: ${wordCountRange} words
+
+NOVEL CONTEXT:
+Premise: ${context.premise}
+Characters: ${context.characters.map(c => `${c.name} (${c.role})`).join(', ')}
+
+PREVIOUS CHAPTER CONTEXT:
+${context.previousChapter ? `Previous chapter summary: ${context.previousChapter.summary}` : 'This is the first chapter.'}
+
+QUALITY REQUIREMENTS (CRITICAL):
+1. Word count: MUST be between ${wordCountRange} words
+2. Em dashes: Maximum ONE em dash (—) allowed in entire chapter
+3. Use en dashes (–) for ranges and connections instead
+4. No repeated phrases, sentence structures, or scene patterns
+5. Show don't tell throughout
+6. Natural, varied dialogue
+7. Distinct scenes that serve the plot
+8. Character-consistent voices and actions
+
+STYLE GUIDELINES:
+- Pacing: ${customization.pacingProfile || 'Moderate'}
+- Dialogue frequency: ${customization.dialogueFrequency || 'Balanced'}
+- Descriptive density: ${customization.descriptiveDensity || 'Moderate'}
+- Show-don't-tell emphasis: High priority
+
+GENRE-SPECIFIC REQUIREMENTS:
+${JSON.stringify(context.genre.getPromptingContext('drafting'), null, 2)}
+
+Write the complete chapter content, ensuring it:
+- Starts with a compelling opening
+- Develops the planned character arcs
+- Advances the plot meaningfully
+- Ends with appropriate transition/hook for next chapter
+- Maintains consistency with established characters and world
+
+Begin writing the chapter now:`;
+
+    return prompt;
+  }
+
+  buildLongChapterPrompt(chapterOutline, context, customization) {
+    const wordCountRange = `${customization.chapterWordCount?.min || 2000}-${customization.chapterWordCount?.max || 4000}`;
+    
+    let prompt = `You are an expert fiction writer crafting a LONG FORM Chapter ${chapterOutline.number} of a ${context.genre.name} novel.
 
 CHAPTER OUTLINE:
 Title: ${chapterOutline.title}

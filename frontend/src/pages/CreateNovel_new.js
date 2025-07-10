@@ -27,7 +27,6 @@ import {
   Box,
   Icon,
   Circle,
-  Switch,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiZap, FiBook } from 'react-icons/fi';
@@ -50,9 +49,7 @@ const CreateNovel = () => {
     workflow: 'chapter-by-chapter',
     generatePremise: false,
     premiseKeywords: '',
-    customInstructions: '',
-    useLongChapters: false,
-    chapterWordCount: 3000
+    customInstructions: ''
   });
 
   useEffect(() => {
@@ -153,9 +150,7 @@ const CreateNovel = () => {
         chapters: formData.chapters,
         writingStyle: formData.writingStyle,
         workflow: formData.workflow,
-        customInstructions: formData.customInstructions,
-        useLongChapters: formData.useLongChapters,
-        chapterWordCount: formData.chapterWordCount
+        customInstructions: formData.customInstructions
       });
 
       toast({
@@ -317,44 +312,6 @@ const CreateNovel = () => {
                   </FormControl>
 
                   <FormControl>
-                    <FormLabel>Chapter Length</FormLabel>
-                    <VStack spacing={4} align="stretch">
-                      <HStack>
-                        <Switch
-                          id="long-chapters"
-                          isChecked={formData.useLongChapters}
-                          onChange={(e) => handleInputChange('useLongChapters', e.target.checked)}
-                        />
-                        <Text>Generate Long-Form Chapters (2000-4000 words)</Text>
-                      </HStack>
-                      
-                      {formData.useLongChapters && (
-                        <FormControl>
-                          <FormLabel>Target Words per Chapter</FormLabel>
-                          <NumberInput
-                            value={formData.chapterWordCount}
-                            onChange={(valueString, valueNumber) => 
-                              handleInputChange('chapterWordCount', valueNumber || 3000)
-                            }
-                            min={2000}
-                            max={4000}
-                            step={250}
-                          >
-                            <NumberInputField />
-                            <NumberInputStepper>
-                              <NumberIncrementStepper />
-                              <NumberDecrementStepper />
-                            </NumberInputStepper>
-                          </NumberInput>
-                          <Text fontSize="sm" color="gray.600" mt={1}>
-                            Long chapters provide more detailed storytelling and character development
-                          </Text>
-                        </FormControl>
-                      )}
-                    </VStack>
-                  </FormControl>
-
-                  <FormControl>
                     <FormLabel>Workflow Type</FormLabel>
                     <Select
                       value={formData.workflow}
@@ -430,15 +387,6 @@ const CreateNovel = () => {
                       <Box>
                         <Text fontWeight="semibold">Writing Style:</Text>
                         <Text>{formData.writingStyle.charAt(0).toUpperCase() + formData.writingStyle.slice(1)}</Text>
-                      </Box>
-                      <Box>
-                        <Text fontWeight="semibold">Chapter Type:</Text>
-                        <Text>
-                          {formData.useLongChapters 
-                            ? `Long-form (${formData.chapterWordCount} words)` 
-                            : 'Standard (1500-2500 words)'
-                          }
-                        </Text>
                       </Box>
                     </SimpleGrid>
 

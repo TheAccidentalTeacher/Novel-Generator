@@ -162,6 +162,111 @@ router.post('/:novelId/generate', async (req, res) => {
   }
 });
 
+// POST /api/chapters/:novelId/generate-long - Generate long-form chapter (2000-4000 words)
+router.post('/:novelId/generate-long', async (req, res) => {
+  try {
+    const { chapterNumber, customInstructions, targetWords } = req.body;
+
+    if (!chapterNumber) {
+      return res.status(400).json({ message: 'Chapter number is required' });
+    }
+
+    // Check if chapter already exists
+    const existingChapter = await Chapter.findOne({
+      novel: req.params.novelId,
+      number: chapterNumber
+    });
+
+    if (existingChapter) {
+      return res.status(400).json({ message: 'Chapter already exists' });
+    }
+
+    const novel = await Novel.findById(req.params.novelId)
+      .populate('characters')
+      .populate({
+        path: 'genre',
+        model: 'Genre'
+      });
+
+    if (!novel) {
+      return res.status(404).json({ message: 'Novel not found' });
+    }
+
+    // Get chapter outline
+    const chapterOutline = getChapterOutline(novel, chapterNumber);
+    if (!chapterOutline) {
+      return res.status(400).json({ message: 'Chapter outline not found' });
+    }
+
+    // Get context for generation
+    const previousChapters = await Chapter.getContextForGeneration(req.params.novelId, chapterNumber);
+    
+    const context = {
+      genre: novel.genre,
+      premise: novel.premise,
+      characters: novel.characters,
+      previousChapter: previousChapters[0] || null
+    };
+
+    // Add custom instructions and target word count
+    const customization = { 
+      ...novel.settings.customization,
+      additionalInstructions: customInstructions,
+      targetWords: targetWords || 3000, // Default to 3000 words
+      chapterWordCount: {
+        min: 2000,
+        max: 4000
+      }
+    };
+
+    // Generate long chapter content
+    const result = await aiService.generateLongChapter(chapterOutline, context, customization);
+
+    // Create chapter document
+    const chapter = new Chapter({
+      novel: req.params.novelId,
+      number: chapterNumber,
+      title: chapterOutline.title,
+      content: {
+        original: result.content,
+        current: result.content
+      },
+      outline: {
+        summary: chapterOutline.summary,
+        objectives: chapterOutline.objectives || []
+      },
+      aiMetadata: result.metadata,
+      status: 'generated'
+    });
+
+    await chapter.save();
+
+    // Add chapter to novel
+    await Novel.findByIdAndUpdate(req.params.novelId, {
+      $push: { chapters: chapter._id },
+      $inc: { 'progress.currentChapter': 1 }
+    });
+
+    logger.info('Long chapter generated', { 
+      novelId: req.params.novelId, 
+      chapterNumber,
+      chapterId: chapter._id,
+      targetWords: customization.targetWords,
+      maxTokens: result.metadata.maxTokens
+    });
+
+    res.status(201).json(chapter);
+  } catch (error) {
+    logger.error('Error generating long chapter', { 
+      error: error.message, 
+      novelId: req.params.novelId,
+      chapterNumber: req.body.chapterNumber,
+      targetWords: req.body.targetWords
+    });
+    res.status(500).json({ message: 'Failed to generate long chapter', error: error.message });
+  }
+});
+
 // POST /api/chapters/:chapterId/review - Review chapter with AI
 router.post('/:chapterId/review', async (req, res) => {
   try {

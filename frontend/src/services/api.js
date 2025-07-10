@@ -71,6 +71,10 @@ export const generateChapter = async (novelId, chapterData) => {
   return apiClient.post(`/chapters/${novelId}/generate`, chapterData);
 };
 
+export const generateLongChapter = async (novelId, chapterData) => {
+  return apiClient.post(`/chapters/${novelId}/generate-long`, chapterData);
+};
+
 export const updateChapter = async (chapterId, chapterData) => {
   return apiClient.put(`/chapters/${chapterId}`, chapterData);
 };
@@ -210,6 +214,7 @@ export const api = {
   fetchChapters,
   fetchChapter,
   generateChapter,
+  generateLongChapter,
   updateChapter,
   reviewChapter,
   regenerateChapter,
